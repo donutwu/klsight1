@@ -8,7 +8,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.File;
 @Component
 public class KeelungSightsCrawler {
    public Sight[] getItems(String keyword) {
@@ -89,8 +91,10 @@ public class KeelungSightsCrawler {
                      addr = content;
                   }
                }
-
-               Sight s1 = new Sight(nam, keyword + "區", zone, img, des, addr);
+               // 转换为绝对路径
+               File file = new File(img);
+               String ablimg = file.getAbsolutePath();
+               Sight s1 = new Sight(nam, keyword + "區", zone, ablimg, des, addr);
                sightList.add(s1);
             }
          }
