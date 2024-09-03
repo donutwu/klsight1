@@ -17,7 +17,7 @@ public class KeelungSightsCrawler {
       ArrayList sightList = new ArrayList();
 
       try {
-         Document doc = Jsoup.connect("https://www.travelking.com.tw/tourguide/taiwan/keelungcity/").get();
+         Document doc = Jsoup.connect("https://www.travelking.com.tw/tourguide/taiwan/keelungcity/").timeout(10000).get();
          Elements h4Elements = doc.select("div.box > h4:containsOwn(" + keyword + "區)");
          Iterator var5 = h4Elements.iterator();
 
