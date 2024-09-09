@@ -92,9 +92,9 @@ public class KeelungSightsCrawler {
                   }
                }
                // 转换为绝对路径
-               File file = new File(img);
-               String ablimg = file.getAbsolutePath();
-               Sight s1 = new Sight(nam, keyword + "區", zone, ablimg, des, addr);
+              // File file = new File(img);
+               //String ablimg = file.getAbsolutePath();
+               Sight s1 = new Sight(nam, keyword + "區", zone, img, des, addr);
                sightList.add(s1);
             }
          }
