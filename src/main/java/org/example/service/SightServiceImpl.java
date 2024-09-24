@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.Sight;
+import org.example.ZoneNotFoundException;
 import org.example.repository.SightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,11 @@ public class SightServiceImpl implements SightService {
 
     @Override
     public List<Sight> getSightsByZone(String zone) {
-        return sightRepository.findAllByZone(zone + "區");
+        List<Sight> sights = sightRepository.findAllByZone(zone + "區");
+        if (sights.isEmpty()) {
+            throw new ZoneNotFoundException("The zone " + zone + " does not exist");
+        }
+        return sights;
     }
 
     @Override

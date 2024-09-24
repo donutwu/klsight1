@@ -16,6 +16,7 @@ public class CrawlerRunnerConfig {
     @Bean
     public ApplicationRunner applicationRunner() {
         return (args) -> {
+           //存取地點
             String[] defaultZones = new String[]{"七堵", "中山", "中正", "仁愛", "安樂", "信義", "暖暖"};
             String[] var3 = defaultZones;
             int var4 = defaultZones.length;
