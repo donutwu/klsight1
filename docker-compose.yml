@@ -1,0 +1,111 @@
+services:
+  backend:
+    image: klsightapi
+    environment:
+      OTEL_SERVICE_NAME: "backend-service"
+      OTEL_RESOURCE_ATTRIBUTES: "service=backend-service,env=dev"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://collector:4317"
+      OTEL_LOGS_EXPORTER: "otlp"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - collector
+    networks:
+      - otel-network
+
+  collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector-contrib:0.91.0
+    ports:
+      - "4317:4317" # gRPC port
+      - "4318:4318" # HTTP port
+      - "55680:55680"
+      - "8889:8889" # Prometheus exporter metrics
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    networks:
+      - otel-network
+
+  jaeger-all-in-one:
+    container_name: jaeger-all-in-one
+    image: jaegertracing/all-in-one:1.46
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    restart: always
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "59077:4317"   # gRPC OTLP receiving port
+      - "14250:14250"  # Additional gRPC port
+    networks:
+      - otel-network
+
+  zipkin-all-in-one:
+    container_name: zipkin-all-in-one
+    image: openzipkin/zipkin:latest
+    restart: always
+    ports:
+      - "9411:9411"
+    networks:
+      - otel-network
+
+  tempo:
+    container_name: tempo
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./tempo.yml:/etc/tempo.yml
+    restart: always
+    ports:
+      - "4317"  # OTLP gRPC
+      - "3200"  # Tempo as Grafana datasource
+    networks:
+      - otel-network
+
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+    ports:
+      - "3100:3100"
+    networks:
+      - otel-network
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --enable-feature=exemplar-storage
+      - --web.enable-remote-write-receiver
+    restart: always
+    ports:
+      - '9090:9090'
+    depends_on:
+      - collector
+    networks:
+      - otel-network
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    volumes:
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+      - jaeger-all-in-one
+      - zipkin-all-in-one
+      - tempo
+    networks:
+      - otel-network
+
+networks:
+  otel-network:
+    driver: bridge

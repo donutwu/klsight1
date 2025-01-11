@@ -1,7 +1,8 @@
 package org.example.controller;
 
 import java.util.List;
-
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.common.Attributes;
 import org.example.Sight;
 import org.example.service.SightService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,4 +33,5 @@ public class SightController {
         System.out.println(sightService.getSightsByZone(zone));
         return sightService.getSightsByZone(zone);
     }
+
 }

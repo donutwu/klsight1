@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.Sight;
+import org.example.Traceable;
 import org.example.ZoneNotFoundException;
 import org.example.repository.SightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import java.util.List;
 public class SightServiceImpl implements SightService {
     @Autowired
     private SightRepository sightRepository;
-
+    @Traceable
     @Override
     public List<Sight> getSightsByZone(String zone) {
         List<Sight> sights = sightRepository.findAllByZone(zone + "區");
@@ -21,7 +22,7 @@ public class SightServiceImpl implements SightService {
         }
         return sights;
     }
-
+    @Traceable
     @Override
     public void printSights() {
         List<Sight> sights = sightRepository.findAll();
